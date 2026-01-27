@@ -1,0 +1,51 @@
+network:
+  name: "case24_ieee_rts"  # New name to avoid overwriting
+  source: "pglib"
+
+load:
+  generator: "agg_load_profile"
+  agg_profile: "default"
+  scenarios: 1500
+  sigma: 0.20                   # Add 5% randomness
+  change_reactive_power: true
+  global_range: 0.5             # Allow ±20% global variation
+  max_scaling_factor: 1.5
+  step_size: 0.02               # Smaller steps: 2%
+  start_scaling_factor: 0.5     # Start at 70% load instead of 100%
+
+topology_perturbation:
+  type: "none"
+  k: 1
+  n_topology_variants: 20
+  elements: [branch, gen]
+
+generation_perturbation:
+  type: "none"
+  sigma: 1.0
+
+admittance_perturbation:
+  type: "random_perturbation"
+  sigma: 0.05
+
+# NEW: Add droop control section
+droop_control:
+  enabled: true
+  omega_0: 1.0
+  V_0: 1.0
+  droop_buses: ['1', '2', '7', '13', '15', '16', '18', '21', '22', '23']
+  mp: 0.05      # Reduced from 0.2 → 3% droop
+  mq: 0.05      # Reduced from 0.2 → 3% droop
+  ref_bus: '13'
+
+settings:
+  num_processes: 8  # Adjust based on your CPU
+  data_dir: "./data_out_droop_publication"
+  large_chunk_size: 100  # Smaller chunks for testing
+  overwrite: true
+  mode: "pf"
+  include_dc_res: false
+  enable_solver_logs: false  # Disable for speed
+  pf_fast: false  # IMPORTANT: Set to false to use our droop solver
+  dcpf_fast: true
+  max_iter: 300
+  seed: 42  # For reproducibility

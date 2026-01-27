@@ -1,0 +1,82 @@
+[build-system]
+requires = ["setuptools >= 80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["gridfm_datakit*"]
+
+[project]
+name = "gridfm-datakit"
+description = "Data Generation Kit"
+readme = "README.md"
+license = "Apache-2.0"
+version = "1.0.2"
+requires-python = ">=3.10,<3.13"
+
+dependencies = [
+    "ipykernel",
+    "matplotlib",
+    "matpowercaseframes",
+    "nbformat",
+    "numba",
+    "numpy",
+    "pandas",
+    "pathlib",
+    "plotly",
+    "pyaml",
+    "requests",
+    "urllib3<2.0.0",
+    "ipywidgets",
+    "ipyfilechooser",
+    "scipy",
+    "juliacall",
+    "networkx",
+    "tqdm",
+    "pyarrow",
+    # Enforce Python <= 3.11 on Windows
+    "gridfm-datakit-winblock ; sys_platform == 'win32' and python_version >= '3.12'"
+]
+
+authors = [
+  {name = "Alban Puech", email = "alban.puech2@ibm.com"},
+  {name = "Matteo Mazzonelli", email = "matteo.mazzonelli1@ibm.com"},
+  {name = "Tamara Govindasamy", email= "tamara.govindasamy@ibm.com"},
+  {name = "Mangaliso Mngomezulu", email= "mngomezulum@ibm.com"},
+  {name = "Etienne Vos", email= "etienne.vos@ibm.com"},
+  {name = "Jonas Weiss", email= "jwe@zurich.ibm.com"},
+]
+
+maintainers = [
+  {name = "Alban Puech", email = "apuech@seas.harvard.edu"},
+]
+
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering"
+]
+
+[project.scripts]
+gridfm_datakit = "gridfm_datakit.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings[python]",
+  "pre-commit",
+  "bandit",
+  "build"
+]
+
+test = [
+  "pytest",
+  "pytest-cov",
+  "pyinstrument",
+  "pytest-xdist"
+]

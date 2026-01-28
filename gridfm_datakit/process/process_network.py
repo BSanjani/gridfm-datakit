@@ -139,7 +139,7 @@ def init_julia(
         Memento.config!("not_set")
         """)
 
-	# Load droop solver
+    # Load droop solver
         import os as _os
         droop_solver_path = _os.path.join(_os.path.dirname(__file__), '..', '..', 'pfdelta', 'droop_solver.jl')
         droop_solver_path = _os.path.abspath(droop_solver_path).replace('\\', '/')
@@ -501,6 +501,14 @@ def apply_slack_single_gen(
 
     return pg_gen_dc
 
+def get_val(obj, key, default=None):
+    """Universal getter for both Dictionaries and NestedNamespace objects."""
+    if obj is None:
+        return default
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
 
 def pf_post_processing(
     scenario_index: int,
@@ -782,15 +790,15 @@ def pf_post_processing(
 
     if include_dc_res:
         if res_dc is not None:
-            X_gen[net.idx_gens_in_service, 14] = pg_gen_dc
+            X_gen[net.idx_gens_in_service, 18] = pg_gen_dc
         else:
-            X_gen[net.idx_gens_in_service, 14] = np.nan
+            X_gen[net.idx_gens_in_service, 18] = np.nan
 
     # Droop parameters (mp_droop, mq_droop) are already in GEN_COLUMNS
     # Fill them with values from droop_config
-    if droop_config and getattr(droop_config, 'enabled', False):
-        mp_val = getattr(droop_config, 'mp', np.nan)
-        mq_val = getattr(droop_config, 'mq', np.nan)
+    if droop_config and get_val(droop_config, 'enabled', False):
+        mp_val = get_val(droop_config, 'mp', np.nan)
+        mq_val = get_val(droop_config, 'mq', np.nan)
     else:
         mp_val = np.nan
         mq_val = np.nan
@@ -800,16 +808,19 @@ def pf_post_processing(
 
     # ========== NEW: SECONDARY CONTROL STORAGE ==========
     # We assume columns 16 and 17 in GEN_COLUMNS are K_I_secondary and P_secondary_mw
+    secondary_cfg = get_val(droop_config, 'secondary_control',{})
+    is_enabled = get_val(secondary_cfg, 'enabled', False)
     ki_val = np.nan
     p_sec_vals = np.zeros(n_gens)
 
-    if droop_config and droop_config.get('secondary_control', {}).get('enabled', False):
+    if droop_config and is_enabled:
         # Get the input parameter used for this scenario
-        ki_val = droop_config['secondary_control'].get('K_I', np.nan)
+        ki_val = get_val(secondary_cfg, 'K_I', np.nan)
     
         # Get the results from the Julia solution
-        if "secondary_results" in res.get("solution", {}):
-            gen_sec_results = res["solution"]["secondary_results"].get("gen_secondary", {})
+        sol = res.get("solution", {})
+        if "secondary_results" in sol:
+            gen_sec_results = sol["secondary_results"].get("gen_secondary", {})
             for i in range(n_gens):
                 # Julia keys are usually strings or integers depending on parse mode
                 # We check both to be safe
@@ -946,27 +957,36 @@ def process_scenario_pf_mode(
                     f.write(
                         f"Caught an exception at scenario {scenario_index} when solving dcpf function: {e}\n",
                     )
-	
+    
         # Randomize droop parameters if enabled
         droop_config_scenario = droop_config
-        if droop_config and getattr(droop_config, 'randomize_droop', False):
+        if (droop_config and (
+            getattr(droop_config, 'randomize_droop', False) or 
+            getattr(getattr(droop_config, 'secondary_control', {}), 'randomize_secondary', False)
+        )):
             import random
             from copy import deepcopy
-            droop_config_scenario = deepcopy(droop_config.to_dict()) if hasattr(droop_config, 'to_dict') else deepcopy(vars(droop_config))
+        if hasattr(droop_config, 'to_dict'):
+                droop_config_scenario = deepcopy(droop_config.to_dict()) 
+        elif isinstance(droop_config, dict):
+            droop_config_scenario = deepcopy(droop_config)
+        else:
+                droop_config_scenario = deepcopy(vars(droop_config))
 
             # Randomize mp (active power droop) within range
-            mp_range = getattr(droop_config, 'mp_range', [0.03, 0.05])
-            droop_config_scenario['mp'] = random.uniform(mp_range[0], mp_range[1])
+        if getattr(droop_config, 'randomize_droop', False):
+                mp_range = getattr(droop_config, 'mp_range', [0.03, 0.05])
+                droop_config_scenario['mp'] = random.uniform(mp_range[0], mp_range[1])
 
-            # Randomize mq (reactive power droop) within range
-            mq_range = getattr(droop_config, 'mq_range', [0.02, 0.04])
-            droop_config_scenario['mq'] = random.uniform(mq_range[0], mq_range[1])
-	    # ========== NEW: SECONDARY CONTROL RANDOMIZATION ==========
-            secondary_cfg = droop_config_scenario.get('secondary_control', {})
-            if secondary_cfg.get('enabled', False) and secondary_cfg.get('randomize_secondary', False):
-                ki_range = secondary_cfg.get('K_I_range', [0.05, 0.20])
-                droop_config_scenario['secondary_control']['K_I'] = random.uniform(ki_range[0], ki_range[1])
-           # ==========================================================
+                # Randomize mq (reactive power droop) within range
+                mq_range = getattr(droop_config, 'mq_range', [0.02, 0.04])
+                droop_config_scenario['mq'] = random.uniform(mq_range[0], mq_range[1])
+                # ========== NEW: SECONDARY CONTROL RANDOMIZATION ==========
+                secondary_cfg = droop_config_scenario.get('secondary_control', {})
+                if secondary_cfg.get('enabled', False) and secondary_cfg.get('randomize_secondary', False):
+                    ki_range = secondary_cfg.get('K_I_range', [0.05, 0.20])
+                    droop_config_scenario['secondary_control']['K_I'] = random.uniform(ki_range[0], ki_range[1])
+                # ==========================================================
         
 
         try:
@@ -985,7 +1005,7 @@ def process_scenario_pf_mode(
             res,
             res_dcpf,
             include_dc_res,
-	    droop_config,
+            droop_config_scenario,
         )
         local_processed_data.append(
             (
@@ -1093,7 +1113,7 @@ def process_scenario_chunk(
                         pf_fast,
                         dcpf_fast,
                         jl,
-			droop_config,
+            droop_config,
                     )
 
                 progress_queue.put(1)  # update queue
@@ -1193,7 +1213,7 @@ def process_scenario_opf_mode(
             res,
             res_dcopf,
             include_dc_res,
-	    droop_config_scenario,
+        droop_config_scenario,
         )
         local_processed_data.append(
             (

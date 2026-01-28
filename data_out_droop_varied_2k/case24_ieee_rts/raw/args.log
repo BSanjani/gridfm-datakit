@@ -1,5 +1,5 @@
 
-New generation started at 2026-01-27 23:15:10
+New generation started at 2026-01-28 00:39:58
 admittance_perturbation:
   sigma: 0.2
   type: random_perturbation
@@ -49,7 +49,7 @@ load:
   generator: agg_load_profile
   global_range: 0.4
   max_scaling_factor: 4.0
-  scenarios: 1500
+  scenarios: 1
   sigma: 0.2
   start_scaling_factor: 1.0
   step_size: 0.1

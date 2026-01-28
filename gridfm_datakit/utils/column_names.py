@@ -14,14 +14,14 @@ GEN_COLUMNS = [
     "cp2_eur_per_mw2",
     "in_service",
     "is_slack_gen",
-]
-
-DC_GEN_COLUMNS = [
-    "p_mw_dc",
     "mp_droop",
     "mq_droop",
     "K_I_secondary",      
-    "P_secondary_mw",     
+    "P_secondary_mw", 
+]
+
+DC_GEN_COLUMNS = [
+    "p_mw_dc",    
 ]
 
 BUS_COLUMNS = [

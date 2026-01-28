@@ -508,6 +508,7 @@ def pf_post_processing(
     res: Dict[str, Any],
     res_dc: Dict[str, Any],
     include_dc_res: bool,
+    droop_config: Union[Dict, None] = None
 ) -> Dict[str, np.ndarray]:
     """Post-process solved network results into numpy arrays for CSV export.
 
@@ -785,6 +786,18 @@ def pf_post_processing(
         else:
             X_gen[net.idx_gens_in_service, 14] = np.nan
 
+    # Droop parameters (mp_droop, mq_droop) are already in GEN_COLUMNS
+    # Fill them with values from droop_config
+    if droop_config and getattr(droop_config, 'enabled', False):
+        mp_val = getattr(droop_config, 'mp', np.nan)
+        mq_val = getattr(droop_config, 'mq', np.nan)
+    else:
+        mp_val = np.nan
+        mq_val = np.nan
+    
+    X_gen[:, 14] = mp_val  # Column 14 is mp_droop
+    X_gen[:, 15] = mq_val  # Column 15 is mq_droop
+
     # --- Y-bus ---
     Y_bus, Yf, Yt = makeYbus(net.baseMVA, net.buses, net.branches)
 
@@ -910,9 +923,25 @@ def process_scenario_pf_mode(
                     f.write(
                         f"Caught an exception at scenario {scenario_index} when solving dcpf function: {e}\n",
                     )
+	
+        # Randomize droop parameters if enabled
+        droop_config_scenario = droop_config
+        if droop_config and getattr(droop_config, 'randomize_droop', False):
+            import random
+            from copy import deepcopy
+            droop_config_scenario = deepcopy(droop_config.to_dict()) if hasattr(droop_config, 'to_dict') else deepcopy(vars(droop_config))
+
+            # Randomize mp (active power droop) within range
+            mp_range = getattr(droop_config, 'mp_range', [0.03, 0.05])
+            droop_config_scenario['mp'] = random.uniform(mp_range[0], mp_range[1])
+
+            # Randomize mq (reactive power droop) within range
+            mq_range = getattr(droop_config, 'mq_range', [0.02, 0.04])
+            droop_config_scenario['mq'] = random.uniform(mq_range[0], mq_range[1])
+        
 
         try:
-            res = run_pf(perturbation, jl, fast=pf_fast, droop_config=droop_config)
+            res = run_pf(perturbation, jl, fast=pf_fast, droop_config=droop_config_scenario)
         except Exception as e:
             with open(error_log_file, "a") as f:
                 f.write(
@@ -927,6 +956,7 @@ def process_scenario_pf_mode(
             res,
             res_dcpf,
             include_dc_res,
+	    droop_config,
         )
         local_processed_data.append(
             (
@@ -1065,6 +1095,7 @@ def process_scenario_opf_mode(
     error_log_file: str,
     include_dc_res: bool,
     jl: Any,
+    droop_config: Union[Dict, None] = None,
 ) -> List[np.ndarray]:
     """Processes a load scenario in OPF mode
 
@@ -1133,6 +1164,7 @@ def process_scenario_opf_mode(
             res,
             res_dcopf,
             include_dc_res,
+	    droop_config_scenario,
         )
         local_processed_data.append(
             (

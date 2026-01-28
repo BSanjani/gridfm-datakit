@@ -1,35 +1,19 @@
-admittance_perturbation:
-  sigma: 0.2
-  type: random_perturbation
-generation_perturbation:
-  sigma: 1.0
-  type: cost_permutation
+network:
+  name: case24_ieee_rts
+  network_dir: none
+  source: pglib
+
 load:
   agg_profile: default
   change_reactive_power: true
   generator: agg_load_profile
   global_range: 0.4
   max_scaling_factor: 4.0
-  scenarios: 10000
+  scenarios: 1500
   sigma: 0.2
   start_scaling_factor: 1.0
   step_size: 0.1
-network:
-  name: case24_ieee_rts
-  network_dir: none
-  source: pglib
-settings:
-  data_dir: ./data_out
-  dcpf_fast: true
-  enable_solver_logs: true
-  include_dc_res: true
-  large_chunk_size: 2250
-  max_iter: 350
-  mode: pf
-  num_processes: 16
-  overwrite: true
-  pf_fast: true
-  seed: null
+
 topology_perturbation:
   elements:
   - branch
@@ -37,18 +21,58 @@ topology_perturbation:
   k: 1
   n_topology_variants: 20
   type: random
-droop_control:
-  enable: true
-  type: "frequency_and_voltage"
-  R_p_range: [0.03, 0.05]
-  R_q_range: [0.02, 0.04]
-  f_nominal: 60.0
-  randomize_droop: true
 
+generation_perturbation:
+  sigma: 1.0
+  type: cost_permutation
+
+admittance_perturbation:
+  sigma: 0.2
+  type: random_perturbation
+
+# UNIFIED DROOP CONTROL CONFIGURATION
 droop_control:
-  enabled: true              # Turn droop on/off
-  omega_0: 1.0               # Reference frequency (pu)
-  V_0: 1.0                   # Reference voltage (pu)
-  droop_buses: [1, 2, 5]     # List of bus indices with droop
-  mp: 0.05                   # Active power droop coefficient
-  mq: 0.05                   # Reactive power droop coefficient
+  enabled: true                      # Enable droop control
+  
+  # Which generators have droop control
+  droop_buses: ['1', '2', '7', '13', '15', '16', '18', '21', '22', '23']  # All IEEE 24 generators
+  
+  # Reference values
+  omega_0: 1.0                       # Reference frequency (1.0 pu = 60 Hz)
+  V_0: 1.0                           # Reference voltage (1.0 pu)
+  f_nominal: 60.0                    # Nominal frequency in Hz
+  ref_bus: '13'                      # Angle reference bus
+  
+  # Droop parameter RANGES (will be randomized per scenario)
+  randomize_droop: true              # Vary droop params per scenario
+  mp_range: [0.03, 0.05]             # Active power droop range (1/R_p)
+  mq_range: [0.02, 0.04]             # Reactive power droop range (1/R_q)
+  
+  # If randomize_droop is false, use these fixed values:
+  mp: 0.05                           # Fixed active droop (if not randomizing)
+  mq: 0.05                           # Fixed reactive droop (if not randomizing)
+  
+  # ========== ADD SECONDARY CONTROL SECTION ==========
+  secondary_control:
+    enabled: true                     # Enable secondary frequency restoration
+    randomize_secondary: true         # Vary secondary gains per scenario
+    K_I_range: [0.05, 0.20]          # Integral gain range (AGC gain)
+    K_I: 0.10                         # Fixed value if randomize_secondary: false
+    time_constant: 300.0              # Restoration time constant (seconds)
+    frequency_deadband: 0.00001       # Don't act if |Δf| < deadband
+    w_primary: 1.0                    # Weight for primary droop objective
+    w_secondary: 0.1                  # Weight for secondary control objective
+  # ====================================================
+
+settings:
+  data_dir: ./data_out_droop_varied_2k
+  dcpf_fast: true
+  enable_solver_logs: false          # Changed to false for speed
+  include_dc_res: true
+  large_chunk_size: 2250
+  max_iter: 350
+  mode: pf
+  num_processes: 16
+  overwrite: true
+  pf_fast: false                     # MUST be false to use our droop solver
+  seed: 42                           # Set seed for reproducibility

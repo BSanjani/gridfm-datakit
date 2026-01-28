@@ -41,7 +41,7 @@ function solve_ac_pf_droop(network_data, droop_params)
     println("\nTermination status: $(result["termination_status"])")
     
     # 4. Extract frequency if successful
-    if result["termination_status"] == LOCALLY_SOLVED || 
+    if result["termination_status"] == LOCALLY_SOLVED ||
        result["termination_status"] == ALMOST_LOCALLY_SOLVED
         try
             df_val = value(var(pm, :df))
@@ -49,8 +49,14 @@ function solve_ac_pf_droop(network_data, droop_params)
             result["solution"]["system_frequency"] = droop_dict["omega_0"] + df_val
             result["solution"]["pf"]=true
             println("Frequency deviation: $df_val pu")
+            
+            # Calculate branch flows
+            update_data!(network_dict, result["solution"])
+            flows = calc_branch_flow_ac(network_dict)
+            result["solution"]["branch"] = flows["branch"]
+            println("Branch flows calculated")
         catch e
-            println("Warning: Could not extract frequency deviation: $e")
+            println("Warning: Could not extract frequency deviation or calculate flows: $e")
         end
     else
         println("Solver did not converge successfully")

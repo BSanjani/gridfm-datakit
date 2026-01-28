@@ -18,6 +18,10 @@ GEN_COLUMNS = [
 
 DC_GEN_COLUMNS = [
     "p_mw_dc",
+    "mp_droop",
+    "mq_droop",
+    "K_I_secondary",      
+    "P_secondary_mw",     
 ]
 
 BUS_COLUMNS = [

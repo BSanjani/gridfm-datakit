@@ -1,0 +1,30 @@
+{
+  "dataset": {
+    "total_scenarios": 1500,
+    "train_samples": 1050,
+    "val_samples": 225,
+    "test_samples": 225,
+    "n_buses": 24
+  },
+  "model": {
+    "total_parameters": 202608,
+    "trainable_parameters": 202608
+  },
+  "training": {
+    "epochs": 100,
+    "best_val_loss": 0.07203803956508636,
+    "final_train_loss": 0.11105099977815852,
+    "training_time_seconds": 7.8911802768707275
+  },
+  "test_performance": {
+    "vm_mae": 0.0006474297842942178,
+    "vm_rmse": 0.0009164429502561688,
+    "vm_max_error": 0.007942914962768555,
+    "vm_mape": 0.06524107605218887,
+    "vm_r2": 0.9961987137794495,
+    "va_mae": 0.19336366653442383,
+    "va_rmse": 0.26236069202423096,
+    "va_max_error": 1.5931224822998047,
+    "va_r2": 0.9983199834823608
+  }
+}

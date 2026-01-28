@@ -1,5 +1,5 @@
 
-New generation started at 2026-01-27 21:58:09
+New generation started at 2026-01-27 23:15:10
 admittance_perturbation:
   sigma: 0.2
   type: random_perturbation
@@ -29,6 +29,17 @@ droop_control:
   omega_0: 1.0
   randomize_droop: true
   ref_bus: '13'
+  secondary_control:
+    K_I: 0.1
+    K_I_range:
+    - 0.05
+    - 0.2
+    enabled: true
+    frequency_deadband: 1.0e-05
+    randomize_secondary: true
+    time_constant: 300.0
+    w_primary: 1.0
+    w_secondary: 0.1
 generation_perturbation:
   sigma: 1.0
   type: cost_permutation

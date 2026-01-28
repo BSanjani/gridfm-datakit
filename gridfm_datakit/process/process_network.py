@@ -798,6 +798,29 @@ def pf_post_processing(
     X_gen[:, 14] = mp_val  # Column 14 is mp_droop
     X_gen[:, 15] = mq_val  # Column 15 is mq_droop
 
+    # ========== NEW: SECONDARY CONTROL STORAGE ==========
+    # We assume columns 16 and 17 in GEN_COLUMNS are K_I_secondary and P_secondary_mw
+    ki_val = np.nan
+    p_sec_vals = np.zeros(n_gens)
+
+    if droop_config and droop_config.get('secondary_control', {}).get('enabled', False):
+        # Get the input parameter used for this scenario
+        ki_val = droop_config['secondary_control'].get('K_I', np.nan)
+    
+        # Get the results from the Julia solution
+        if "secondary_results" in res.get("solution", {}):
+            gen_sec_results = res["solution"]["secondary_results"].get("gen_secondary", {})
+            for i in range(n_gens):
+                # Julia keys are usually strings or integers depending on parse mode
+                # We check both to be safe
+                gen_id = i + 1
+                p_sec_pu = gen_sec_results.get(gen_id, gen_sec_results.get(str(gen_id), 0.0))
+                p_sec_vals[i] = p_sec_pu * net.baseMVA
+
+    X_gen[:, 16] = ki_val      # K_I_secondary
+    X_gen[:, 17] = p_sec_vals  # P_secondary_mw
+    # ====================================================
+
     # --- Y-bus ---
     Y_bus, Yf, Yt = makeYbus(net.baseMVA, net.buses, net.branches)
 
@@ -938,6 +961,12 @@ def process_scenario_pf_mode(
             # Randomize mq (reactive power droop) within range
             mq_range = getattr(droop_config, 'mq_range', [0.02, 0.04])
             droop_config_scenario['mq'] = random.uniform(mq_range[0], mq_range[1])
+	    # ========== NEW: SECONDARY CONTROL RANDOMIZATION ==========
+            secondary_cfg = droop_config_scenario.get('secondary_control', {})
+            if secondary_cfg.get('enabled', False) and secondary_cfg.get('randomize_secondary', False):
+                ki_range = secondary_cfg.get('K_I_range', [0.05, 0.20])
+                droop_config_scenario['secondary_control']['K_I'] = random.uniform(ki_range[0], ki_range[1])
+           # ==========================================================
         
 
         try:

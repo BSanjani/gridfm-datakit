@@ -1,0 +1,78 @@
+
+New generation started at 2026-01-28 12:29:06
+admittance_perturbation:
+  sigma: 0.2
+  type: random_perturbation
+droop_control:
+  V_0: 1.0
+  droop_buses:
+  - '1'
+  - '2'
+  - '7'
+  - '13'
+  - '15'
+  - '16'
+  - '18'
+  - '21'
+  - '22'
+  - '23'
+  enabled: true
+  f_nominal: 60.0
+  mp: 0.05
+  mp_range:
+  - 0.03
+  - 0.05
+  mq: 0.05
+  mq_range:
+  - 0.02
+  - 0.04
+  omega_0: 1.0
+  randomize_droop: true
+  ref_bus: '13'
+  secondary_control:
+    K_I: 0.1
+    K_I_range:
+    - 0.05
+    - 0.2
+    enabled: true
+    frequency_deadband: 1.0e-05
+    randomize_secondary: true
+    time_constant: 300.0
+    w_primary: 1.0
+    w_secondary: 0.1
+generation_perturbation:
+  sigma: 1.0
+  type: cost_permutation
+load:
+  agg_profile: default
+  change_reactive_power: true
+  generator: agg_load_profile
+  global_range: 0.4
+  max_scaling_factor: 4.0
+  scenarios: 1500
+  sigma: 0.2
+  start_scaling_factor: 1.0
+  step_size: 0.1
+network:
+  name: case24_ieee_rts
+  network_dir: none
+  source: pglib
+settings:
+  data_dir: ./data_out_droop_secondary_varied_1500
+  dcpf_fast: true
+  enable_solver_logs: false
+  include_dc_res: true
+  large_chunk_size: 2250
+  max_iter: 350
+  mode: pf
+  num_processes: 16
+  overwrite: true
+  pf_fast: false
+  seed: 42
+topology_perturbation:
+  elements:
+  - branch
+  - gen
+  k: 1
+  n_topology_variants: 20
+  type: random

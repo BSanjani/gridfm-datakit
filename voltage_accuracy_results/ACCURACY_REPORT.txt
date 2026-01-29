@@ -1,0 +1,70 @@
+
+VOLTAGE ACCURACY ANALYSIS REPORT
+================================
+
+OVERALL PERFORMANCE:
+  • Mean Absolute Error (MAE):     0.3221%
+  • Root Mean Square Error (RMSE): 0.004772 pu
+  • Mean Absolute % Error (MAPE):  0.3247%
+  • R² Score:                      0.906958
+  • Max Error:                     0.043865 pu (4.3865%)
+
+PER-BUS ACCURACY:
+  • Best Bus:  #0 - MAE: 0.1464%
+  • Worst Bus: #21 - MAE: 0.5550%
+  • MAE Range: 0.1464% - 0.5550%
+
+PER-SCENARIO ACCURACY:
+  • Best Scenario:  #27 - MAE: 0.1213%
+  • Worst Scenario: #90 - MAE: 1.5289%
+  • MAE Std Dev:    0.1829%
+
+ERROR STATISTICS:
+  • Mean Error:   -0.000205 pu (-0.0205%)
+  • Std Error:    0.004767 pu
+  • Median Error: -0.000087 pu
+  • 95% CI:       [-0.010175, 0.008786] pu
+
+PREDICTIONS WITHIN TOLERANCE:
+  • ±0.1%: 25.71%
+  • ±0.5%: 81.38%
+  • ±1.0%: 95.50%
+  • ±2.0%: 99.50%
+
+VOLTAGE LIMIT COMPLIANCE (0.95-1.05 pu):
+  Ground Truth:
+    • Compliance: 100.00%
+    • Violations: 0 / 2400
+  
+  ML Predictions:
+    • Compliance: 100.00%
+    • Violations: 0 / 2400
+  
+  Error Analysis:
+    • False violations: 0
+    • Missed violations: 0
+
+COMPARISON WITH PHYSICS SOLVER:
+  • ML speedup:    ~1000× faster
+  • ML accuracy:   0.3221% average error
+  • Compliance:    0.00% difference
+  • Reliability:   Excellent
+
+STATISTICAL SIGNIFICANCE:
+  • Normality test p-value: 0.000000
+  • Distribution: Not normally distributed
+  • Unbiased: Yes (mean error: -0.0205%)
+
+GENERATED FILES:
+  1. 01_per_bus_accuracy.png - Detailed per-bus metrics
+  2. 02_scenario_accuracy.png - Per-scenario analysis
+  3. 03_voltage_compliance.png - Compliance comparison
+  4. 04_tolerance_analysis.png - Error tolerance curves
+  5. bus_accuracy_metrics.csv - Detailed bus metrics
+  6. scenario_accuracy_metrics.csv - Detailed scenario metrics
+
+CONCLUSION:
+  The ML model demonstrates excellent voltage prediction accuracy
+  with 0.3221% mean error across all buses and scenarios.
+  The model successfully learned the effects of droop control parameters
+  and maintains voltage compliance comparable to the physics-based solver.

@@ -9,7 +9,7 @@ load:
   generator: agg_load_profile
   global_range: 0.4
   max_scaling_factor: 4.0
-  scenarios: 1
+  scenarios: 1500
   sigma: 0.2
   start_scaling_factor: 1.0
   step_size: 0.1
@@ -65,7 +65,7 @@ droop_control:
   # ====================================================
 
 settings:
-  data_dir: ./data_out_droop_varied_2k
+  data_dir: ./data_out_droop_secondary_varied_1500
   dcpf_fast: true
   enable_solver_logs: false          # Changed to false for speed
   include_dc_res: true

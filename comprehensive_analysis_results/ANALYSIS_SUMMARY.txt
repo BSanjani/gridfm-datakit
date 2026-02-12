@@ -1,0 +1,38 @@
+
+COMPREHENSIVE ANALYSIS SUMMARY
+==============================
+
+DATASET:
+  • Scenarios: 100
+  • Buses: 24
+  • Total samples: 46176
+
+CONTROL PARAMETERS:
+  • mp_droop range: 0.0301 - 0.0500
+  • mq_droop range: 0.0201 - 0.0399
+  • K_I_secondary range: 0.0504 - 0.1970
+
+VOLTAGE PERFORMANCE:
+  • Mean: 0.9897 pu
+  • Std: 0.0157 pu
+  • Range: [0.9501, 1.0497] pu
+
+SYSTEM OPERATION:
+  • Load range: [37721.5, 56898.0] MW
+  • Generation range: [38115.3, 57667.7] MW
+  • Mean losses: 565.81 MW (1.18%)
+
+ML MODEL PERFORMANCE:
+  • Voltage MAE: 0.003221 pu (0.3221%)
+  • Voltage R²: 0.906958
+  • Angle MAE: 1.0170°
+  • Angle R²: 0.956679
+
+GENERATED PLOTS:
+  1. 01_voltage_analysis.png - Voltage distributions and correlations
+  2. 02_droop_control_analysis.png - Control parameter effects
+  3. 03_ml_performance.png - ML model accuracy
+  4. 04_control_sensitivity.png - Sensitivity heatmaps
+  5. 05_generation_load_balance.png - Power balance analysis
+  6. 06_frequency_analysis.png - Frequency deviation analysis
+  7. 07_comparative_analysis.png - Scenario comparisons

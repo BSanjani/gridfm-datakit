@@ -1,0 +1,2 @@
+[console_scripts]
+gridfm_datakit = gridfm_datakit.cli:main

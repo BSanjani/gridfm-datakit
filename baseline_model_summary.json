@@ -1,0 +1,16 @@
+{
+  "model_type": "Baseline (No Droop)",
+  "input_features": 48,
+  "output_features": 48,
+  "total_parameters": 58320,
+  "training_epochs": 27,
+  "best_val_loss": 0.8604232985922631,
+  "test_performance": {
+    "vm_mae_pu": 0.00473814969882369,
+    "vm_mae_pct": 0.47381496988236904,
+    "vm_rmse": 0.010569415108076597,
+    "vm_r2": 0.6015918850898743,
+    "va_mae": 2.5284838676452637,
+    "va_r2": 0.7831906080245972
+  }
+}

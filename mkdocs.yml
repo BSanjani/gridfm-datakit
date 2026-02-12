@@ -1,0 +1,82 @@
+site_name: "gridfm-datakit"
+repo_url: https://github.com/gridfm/gridfm-datakit
+repo_name: GitHub
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Manual:
+      - Getting Started: manual/getting_started.md
+      - Network: manual/network.md
+      - Load Scenarios: manual/load_scenarios.md
+      - Topology Perturbations: manual/topology_perturbations.md
+      - Generation Perturbations: manual/generation_perturbations.md
+      - Admittance Perturbations: manual/admittance_perturbations.md
+      - Outputs: manual/outputs.md
+  - Components:
+    - Network: components/network.md
+    - Perturbations:
+      - Load: components/load.md
+      - Topology: components/topology.md
+      - Generator: components/generator_perturbation.md
+      - Admittance: components/admittance_perturbation.md
+    - Process:
+      - Process Network: components/process_network.md
+      - Solvers: components/solvers.md
+    - Save: components/save.md
+    - Utils:
+      - Utils: components/utils.md
+      - Stats: components/stats.md
+      - Power Balance: components/power_balance.md
+      - Param Handler: components/param_handler.md
+    - Generate: components/generate.md
+    - Validation: components/validation.md
+    - CLI: components/cli.md
+
+
+theme:
+  name: material
+  palette:
+    primary: white
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.indexes
+    - navigation.tracking
+    - toc.follow   # <-- Add this line
+    - toc.follow
+    - search.suggest
+    - navigation.instant
+    - navigation.instant.progress
+  logo: figs/KIT_logo.png
+  favicon: figs/KIT_logo.png
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            heading_level: 0
+            show_root_heading: false
+
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - md_in_html
+
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - stylesheets/extra.css
+  - https://unpkg.com/katex@0/dist/katex.min.css

@@ -1,0 +1,81 @@
+
+================================================================================
+INSTALLING AND USING JUNIPER.JL FOR BINARY VARIABLES
+================================================================================
+
+STEP 1: INSTALL JUNIPER IN JULIA
+---------------------------------
+Open Julia REPL and run:
+
+    using Pkg
+    Pkg.add("Juniper")
+    Pkg.add("Ipopt")  # Juniper uses Ipopt as NLP sub-solver
+
+STEP 2: MODIFY YOUR DROOP_SOLVER.JL FILE
+-----------------------------------------
+At the top of your droop_solver.jl file, change:
+
+FROM:
+    using Ipopt
+    
+    function solve_ac_pf_droop(network_data, droop_params)
+        result = solve_model(network_data, ACPPowerModel, build_droop_pf, 
+                            optimizer_with_attributes(Ipopt.Optimizer, 
+                                "print_level" => 0))
+        ...
+    end
+
+TO:
+    using Ipopt
+    using Juniper
+    
+    function solve_ac_pf_droop(network_data, droop_params)
+        # Create Ipopt optimizer for NLP sub-problems
+        ipopt = optimizer_with_attributes(Ipopt.Optimizer,
+            "print_level" => 0,
+            "sb" => "yes")
+        
+        # Create Juniper optimizer with Ipopt as NLP solver
+        juniper = optimizer_with_attributes(Juniper.Optimizer,
+            "nl_solver" => ipopt,
+            "log_levels" => [:Info],
+            "branch_strategy" => :StrongPseudoCost,
+            "mip_gap" => 1e-4)
+        
+        result = solve_model(network_data, ACPPowerModel, build_droop_pf, juniper)
+        ...
+    end
+
+STEP 3: USE THE BINARY VARIABLE IMPLEMENTATION
+-----------------------------------------------
+Now you can use the build_droop_pf() function I provided earlier with binary
+variables (z_pos, z_neg, z_mid) - Juniper will handle them properly!
+
+STEP 4: TEST WITH ONE SCENARIO
+-------------------------------
+    python gridfm_datakit\cli.py generate droop_case57_test_smooth.yaml
+
+JUNIPER PARAMETERS EXPLAINED:
+------------------------------
+- nl_solver: The NLP solver for continuous relaxations (use Ipopt)
+- log_levels: [:Info] shows progress, [:Table] shows detailed iteration info
+- branch_strategy: How to select variables for branching
+  * :MostInfeasible (default, faster)
+  * :StrongPseudoCost (smarter, may be slower but better quality)
+- mip_gap: Optimality tolerance (1e-4 = 0.01% gap is good for power flow)
+
+EXPECTED PERFORMANCE:
+---------------------
+- First scenario: ~30-60 seconds (slower than Ipopt alone)
+- Subsequent scenarios: Should benefit from warm starting
+- Trade-off: Slower but CORRECT deadband implementation
+
+ALTERNATIVE SOLVERS (if Juniper is too slow):
+----------------------------------------------
+1. SCIP (free, very good): Pkg.add("SCIP")
+2. Gurobi (commercial, fastest): Requires license
+3. CPLEX (commercial): Requires license
+
+For your research, Juniper (free) should be sufficient!
+
+================================================================================

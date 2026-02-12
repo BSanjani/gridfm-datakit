@@ -1,0 +1,18 @@
+# Log files
+*.log
+debug_*.log
+
+# Large data output directories
+data_out*/
+data_out_*/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Model files
+*.pth
+
+# Virtual environment
+venv/

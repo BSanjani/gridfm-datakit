@@ -1,0 +1,39 @@
+admittance_perturbation:
+  sigma: 0.2
+  type: random_perturbation
+generation_perturbation:
+  sigma: 1.0
+  type: cost_permutation
+load:
+  agg_profile: default
+  change_reactive_power: true
+  generator: agg_load_profile
+  global_range: 0.1
+  max_scaling_factor: 1.2
+  scenarios: 1
+  sigma: 0.2
+  start_scaling_factor: 1.0
+  step_size: 0.1
+network:
+  name: case118_ieee
+  network_dir: none
+  source: pglib
+settings:
+  data_dir: ./data_out_baseline_case118_test
+  dcpf_fast: true
+  enable_solver_logs: false
+  include_dc_res: true
+  large_chunk_size: 2250
+  max_iter: 350
+  mode: pf
+  num_processes: 1
+  overwrite: true
+  pf_fast: false
+  seed: 42
+topology_perturbation:
+  elements:
+  - branch
+  - gen
+  k: 1
+  n_topology_variants: 1
+  type: random

@@ -1,0 +1,64 @@
+admittance_perturbation:
+  sigma: 0.2
+  type: random_perturbation
+droop_control:
+  V_0: 1.0
+  droop_buses:
+  - '1'
+  - '2'
+  - '3'
+  - '6'
+  - '8'
+  - '9'
+  - '12'
+  enabled: true  
+  frequency_deadband: 0.0006  # ±0.036 Hz (±0.06% at 60 Hz)
+  voltage_deadband: 0.001     # ±0.1% voltage deadband
+  f_nominal: 60.0
+  mp: 0.08
+  mp_range:
+  - 0.06
+  - 0.10
+  mq: 0.08
+  mq_range:
+  - 0.06
+  - 0.10
+  omega_0: 1.0
+  randomize_droop: true
+  ref_bus: '1'
+generation_perturbation:
+  sigma: 1.0
+  type: cost_permutation
+load:
+  agg_profile: default
+  change_reactive_power: true
+  generator: agg_load_profile
+  global_range: 0.4
+  max_scaling_factor: 4.0
+  scenarios: 10
+  sigma: 0.2
+  start_scaling_factor: 1.2
+  step_size: 0.1
+network:
+  name: case57_ieee
+  network_dir: none
+  source: pglib
+settings:
+  data_dir: ./data_out_droop_case57_5000
+  dcpf_fast: true
+  enable_solver_logs: false
+  include_dc_res: true
+  large_chunk_size: 2250
+  max_iter: 500
+  mode: pf
+  num_processes: 16
+  overwrite: true
+  pf_fast: false
+  seed: 42
+topology_perturbation:
+  elements:
+  - branch
+  - gen
+  k: 1
+  n_topology_variants: 20
+  type: random

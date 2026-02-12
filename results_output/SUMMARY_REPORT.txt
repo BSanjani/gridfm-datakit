@@ -1,0 +1,60 @@
+
+======================================================================
+GRIDFM POWER FLOW ANALYSIS - SUMMARY REPORT
+======================================================================
+
+DATASET OVERVIEW
+----------------------------------------------------------------------
+Total Samples:              4,789,008
+Number of Scenarios:        199,542
+Number of Buses:            24
+Number of Generators:       33
+Number of Branches:         38
+
+VOLTAGE STATISTICS
+----------------------------------------------------------------------
+Mean Voltage Magnitude:     1.0317 p.u.
+Std Voltage Magnitude:      0.0168 p.u.
+Voltage Violations:         3.56%
+
+POWER STATISTICS
+----------------------------------------------------------------------
+Total Active Load (avg):    2497.84 MW
+Total Reactive Load (avg):  508.22 MVAr
+Total Generation (avg):     2528.44 MW
+
+SOLVER PERFORMANCE
+----------------------------------------------------------------------
+AC-PF Mean Runtime:         0.0018 seconds
+AC-PF Median Runtime:       0.0020 seconds
+
+ML MODEL PERFORMANCE
+----------------------------------------------------------------------
+Voltage Magnitude MAE:      0.003162 p.u. (0.316%)
+Voltage Angle MAE:          1.6037 degrees
+ML Inference Time:          0.2480 ms
+Speedup vs Traditional:     7x
+
+OUTPUT FILES GENERATED
+----------------------------------------------------------------------
+All results saved to: results_output/
+
+CSV Files:
+  - dataset_statistics.csv
+  - voltage_statistics_by_bus.csv
+  - power_statistics_by_bus.csv
+  - generator_statistics.csv
+  - branch_statistics.csv
+  - runtime_statistics.csv
+  - ml_model_errors.csv
+
+Plots (PNG and PDF):
+  - voltage_distributions
+  - power_distributions
+  - branch_loading
+
+JSON Files:
+  - dataset_statistics.json
+  - ml_performance_metrics.json
+
+======================================================================

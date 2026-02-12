@@ -1,0 +1,45 @@
+{
+  "dataset": {
+    "total_scenarios": 4,
+    "train_samples": 2,
+    "val_samples": 1,
+    "test_samples": 1,
+    "n_buses": 57,
+    "input_features": 116,
+    "load_features": 114,
+    "control_features": 3
+  },
+  "control_parameters": {
+    "mp_droop_range": [
+      0.08,
+      0.08
+    ],
+    "mq_droop_range": [
+      0.08,
+      0.08
+    ]
+  },
+  "model": {
+    "total_parameters": 77906,
+    "trainable_parameters": 77906,
+    "architecture": "Control-Aware Power Flow NN"
+  },
+  "training": {
+    "epochs_trained": 53,
+    "best_epoch": 33,
+    "best_val_loss": 578385.4375,
+    "final_train_loss": 0.8310208320617676,
+    "training_time_seconds": 0.42199158668518066
+  },
+  "test_performance": {
+    "vm_mae": 0.003448665142059326,
+    "vm_rmse": 0.0046422723680734634,
+    "vm_max_error": 0.012994527816772461,
+    "vm_mape": 0.3431263566017151,
+    "vm_r2": 0.9740961194038391,
+    "va_mae": 1.160013198852539,
+    "va_rmse": 1.5244300365447998,
+    "va_max_error": 3.875300884246826,
+    "va_r2": 0.8328935503959656
+  }
+}

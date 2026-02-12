@@ -1,0 +1,9 @@
+{
+  "Total Samples": 4789008,
+  "Number of Scenarios": 199542,
+  "Number of Buses": 24,
+  "Number of Generators": 33,
+  "Number of Branches": 38,
+  "Load Scenarios": 9982,
+  "Topology Variants per Load": 19
+}

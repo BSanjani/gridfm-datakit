@@ -1,0 +1,84 @@
+
+======================================================================
+POWER FLOW COMPARISON: DROOP CONTROL VS BASELINE
+======================================================================
+
+DATASET INFORMATION:
+  Droop Control Scenarios:    1924
+  Baseline Scenarios:         29031
+  Number of Buses:            24
+  Number of Branches:         38
+  Number of Generators:       33
+
+======================================================================
+VOLTAGE PERFORMANCE METRICS
+======================================================================
+
+Average Voltage Magnitude:
+  Droop Control:              0.989710 p.u.
+  Baseline:                   0.991297 p.u.
+  Difference:                 -0.001587 p.u.
+
+Voltage Standard Deviation:
+  Droop Control:              0.015731 p.u.
+  Baseline:                   0.017214 p.u.
+  Improvement:                8.61%
+
+Average Voltage Deviation from Rated (1.0 p.u.):
+  Droop Control:              0.014970 p.u.
+  Baseline:                   0.015687 p.u.
+  Improvement:                4.57%
+
+Maximum Voltage Deviation:
+  Droop Control:              0.049947 p.u.
+  Baseline:                   0.050000 p.u.
+
+Voltage Violations (outside 0.95-1.05 p.u.):
+  Droop Control:              0 (0.00%)
+  Baseline:                   0 (0.00%)
+
+======================================================================
+GENERATOR PERFORMANCE METRICS
+======================================================================
+
+Average Active Power Output:
+  Droop Control:              75.288 MW
+  Baseline:                   75.923 MW
+  Difference:                 -0.635 MW
+
+Average Reactive Power Output:
+  Droop Control:              15.412 MVAr
+  Baseline:                   12.321 MVAr
+  Difference:                 3.091 MVAr
+
+======================================================================
+BRANCH FLOW METRICS
+======================================================================
+
+Average Branch Active Power Flow (absolute):
+  Droop Control:              90.175 MW
+  Baseline:                   90.678 MW
+  Improvement:                0.55%
+
+Maximum Branch Flow:
+  Droop Control:              355.494 MW
+  Baseline:                   409.650 MW
+
+======================================================================
+KEY FINDINGS
+======================================================================
+
+1. Voltage Regulation: Droop control shows 8.61% improvement in 
+   voltage stability (lower standard deviation)
+
+2. Voltage Deviation: Average deviation from rated voltage improved by 
+   4.57% with droop control
+
+3. Power Flow: Branch flows show 0.55% improvement
+
+4. Buses with Most Improvement (Top 3):
+   - Bus 17.0: 1.78% improvement
+   - Bus 20.0: 1.39% improvement
+   - Bus 14.0: 0.91% improvement
+
+======================================================================

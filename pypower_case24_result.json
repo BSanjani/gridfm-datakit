@@ -1,0 +1,8 @@
+{
+  "case": "IEEE 24-bus",
+  "converged": 1,
+  "df": 0.0015881928675454127,
+  "iterations": 23,
+  "total_gen": 2897.6031403762154,
+  "total_load": 2850.0
+}

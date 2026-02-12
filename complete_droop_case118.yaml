@@ -1,0 +1,76 @@
+admittance_perturbation:
+  sigma: 0.1
+  type: random_perturbation
+droop_control:
+  V_0: 1.0
+  droop_buses:
+  - '10'
+  - '12'
+  - '25'
+  - '26'
+  - '31'
+  - '46'
+  - '49'
+  - '54'
+  - '59'
+  - '61'
+  - '65'
+  - '66'
+  - '69'
+  - '80'
+  - '87'
+  - '89'
+  - '100'
+  - '103'
+  - '111'
+  enabled: true
+  f_nominal: 60.0
+  mp: 0.10
+  mp_range:
+  - 0.08
+  - 0.12
+  mq: 0.10
+  mq_range:
+  - 0.08
+  - 0.12
+  omega_0: 1.0
+  randomize_droop: false
+  ref_bus: '69'
+  secondary_control:
+    enabled: false
+generation_perturbation:
+  sigma: 0.5
+  type: cost_permutation
+load:
+  agg_profile: default
+  change_reactive_power: true
+  generator: agg_load_profile
+  global_range: 0.05
+  max_scaling_factor: 1.05
+  scenarios: 5
+  sigma: 0.1
+  start_scaling_factor: 1.0
+  step_size: 0.05
+network:
+  name: case118_ieee
+  network_dir: none
+  source: pglib
+settings:
+  data_dir: ./data_out_droop_case118_final
+  dcpf_fast: true
+  enable_solver_logs: false
+  include_dc_res: true
+  large_chunk_size: 2250
+  max_iter: 500
+  mode: pf
+  num_processes: 1
+  overwrite: true
+  pf_fast: false
+  seed: 42
+topology_perturbation:
+  elements:
+  - branch
+  - gen
+  k: 1
+  n_topology_variants: 1
+  type: random

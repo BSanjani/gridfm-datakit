@@ -5,7 +5,7 @@ network:
 
 settings:
   mode: pf
-  data_dir: ./data_out_ieee24_droop_droop_10k
+  data_dir: ./data_out_ieee24_droop_droop_withoutdeadband_10k
   num_processes: 16
   max_iter: 350
   pf_fast: false
@@ -26,8 +26,8 @@ droop_control:
   randomize_droop: true
   mp_range: [0.03, 0.05]
   mq_range: [0.02, 0.04]
-  frequency_deadband: 0.0006  # ±0.036 Hz (±0.06% at 60 Hz)
-  voltage_deadband: 0.0001     # ±0.01% voltage deadband
+  # frequency_deadband: 0.0006  # ±0.036 Hz (±0.06% at 60 Hz)
+  # voltage_deadband: 0.0001     # ±0.01% voltage deadband
 
 load:
   generator: agg_load_profile

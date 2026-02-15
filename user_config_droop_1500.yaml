@@ -10,7 +10,7 @@ settings:
   mode: pf
   data_dir: ./data_out_ieee14_droop_withdeadband
   num_processes: 8
-  max_iter: 100
+  max_iter: 300
   pf_fast: false
   dcpf_fast: true
   seed: 42
@@ -21,7 +21,7 @@ settings:
 
 # CRITICAL FIX: Reference bus must be the slack bus (Bus 0)
 droop_control:
-  enabled: true  # ✅ DISABLED for basic power flow comparison
+  enabled: false  # ✅ DISABLED for basic power flow comparison
   f_nominal: 60.0
   omega_0: 1.0
   V_0: 1.0
@@ -32,8 +32,8 @@ droop_control:
   randomize_droop: true  # Keep false for deterministic results
   mp_range: [0.03, 0.05]
   mq_range: [0.02, 0.04]
-  # frequency_deadband: 0.006  # 0.6% frequency deadband
-  # voltage_deadband: 0.001  # 0.1% voltage deadband
+  frequency_deadband: 0.006  # 0.6% frequency deadband
+  voltage_deadband: 0.001  # 0.1% voltage deadband
 
 # Base load case (no variations for initial comparison)
 load:

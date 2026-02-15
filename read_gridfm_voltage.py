@@ -17,6 +17,34 @@ print("=" * 70)
 
 # Read bus voltage data from parquet
 bus_data_path = os.path.join(results_dir, "bus_data.parquet")
+gen_data_path = os.path.join(results_dir, "gen_data.parquet")
+branch_data_path = os.path.join(results_dir, "branch_data.parquet")
+
+if os.path.exists(branch_data_path):
+    print(f"\n✓ Reading branch data from: {branch_data_path}")
+    branch_df = pd.read_parquet(branch_data_path)
+    print(f"  Shape: {branch_df.shape[0]} rows × {branch_df.shape[1]} columns")
+    print(f"  Columns: {list(branch_df.columns)}")
+    
+    # Show branch data
+    print("\n" + "-" * 70)
+    print("First 10 rows of branch data:")
+    print("-" * 70)
+    print(branch_df.head(10))
+
+if os.path.exists(gen_data_path):
+    print(f"\n✓ Reading generator data from: {gen_data_path}")
+    gen_df = pd.read_parquet(gen_data_path)
+    print(f"  Shape: {gen_df.shape[0]} rows × {gen_df.shape[1]} columns")
+    print(f"  Columns: {list(gen_df.columns)}")
+    
+    # Show generator data    print("\n" + "-" * 70)
+    print("First 10 rows of generator data:")
+    print("-" * 70)
+    print(gen_df.head(10))
+
+
+
 
 if os.path.exists(bus_data_path):
     print(f"\n✓ Reading: {bus_data_path}")

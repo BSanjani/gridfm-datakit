@@ -426,7 +426,7 @@ def generate_power_flow_data_distributed(
                         admittance_generator,
                         file_paths["error_log"],
                         args.settings.include_dc_res,
-                        args.settings.pf_fast,
+                        args.settings.dcpf_fast,
                         args.settings.pf_fast,
                         file_paths["solver_log_dir"],
                         args.settings.max_iter,

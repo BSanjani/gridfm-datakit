@@ -2,9 +2,9 @@
 # Use this for basic power flow comparison with PSCAD
 
 network:
-  name: case14_ieee
-  source: pglib
-  network_dir: none
+  name: case14_ieee_corrected
+  source: file
+  network_dir: .
 
 settings:
   mode: pf

@@ -21,10 +21,13 @@ with open('user_config2.yaml', 'r') as f:
     config = yaml.safe_load(f)
 
 droop_config = config['droop_control']
-print(f"Droop control enabled: {droop_config['enable']}")
+droop_enabled = droop_config.get("enabled", droop_config.get("enable", False))
+rp_range = droop_config.get("R_p_range", droop_config.get("mp_range"))
+rq_range = droop_config.get("R_q_range", droop_config.get("mq_range"))
+print(f"Droop control enabled: {droop_enabled}")
 print(f"Droop type: {droop_config['type']}")
-print(f"R_p range: {droop_config['R_p_range']}")
-print(f"R_q range: {droop_config['R_q_range']}")
+print(f"R_p range: {rp_range}")
+print(f"R_q range: {rq_range}")
 print(f"Nominal frequency: {droop_config['f_nominal']} Hz")
 
 # ============================================================================

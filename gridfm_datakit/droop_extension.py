@@ -4,7 +4,6 @@ Adds frequency and voltage droop response to generator data
 """
 
 import numpy as np
-import pandas as pd
 
 def add_droop_parameters(gen_data, droop_config):
     """
@@ -23,15 +22,20 @@ def add_droop_parameters(gen_data, droop_config):
         Generator data with added droop parameters
     """
     
-    if not droop_config.get('enable', False):
+    enabled = droop_config.get("enabled", droop_config.get("enable", False))
+    if not enabled:
         print("Droop control is disabled")
         return gen_data
     
     n_gens = len(gen_data)
     
     # Extract droop ranges
-    R_p_min, R_p_max = droop_config['R_p_range']
-    R_q_min, R_q_max = droop_config['R_q_range']
+    rp_range = droop_config.get("R_p_range", droop_config.get("mp_range"))
+    rq_range = droop_config.get("R_q_range", droop_config.get("mq_range"))
+    if rp_range is None or rq_range is None:
+        raise KeyError("Droop config must provide R_p_range/R_q_range or mp_range/mq_range")
+    R_p_min, R_p_max = rp_range
+    R_q_min, R_q_max = rq_range
     
     # Generate droop coefficients
     if droop_config.get('randomize_droop', True):
@@ -79,7 +83,8 @@ def calculate_droop_response(gen_data, bus_data, droop_config):
         Generator data with droop-adjusted power outputs
     """
     
-    if not droop_config.get('enable', False):
+    enabled = droop_config.get("enabled", droop_config.get("enable", False))
+    if not enabled:
         return gen_data
     
     # Make a copy to avoid modifying original

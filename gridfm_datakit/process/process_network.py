@@ -556,14 +556,6 @@ def pf_post_processing(
     X_branch[:, 2] = np.real(net.branches[:, F_BUS])
     X_branch[:, 3] = np.real(net.branches[:, T_BUS])
 
-    # Add BEFORE the if statement (around line 559)
-    print(f"\n=== BRANCH DEBUG ===")
-    print(f"res['solution']['pf']: {res['solution']['pf']}")
-    print(f"n_branches (total): {n_branches}")
-    print(f"n_branches in solution: {len(res['solution']['branch'])}")
-    print(f"n_branches in-service: {len(net.idx_branches_in_service)}")
-    print(f"===================\n")
-
     if res["solution"]["pf"]:
         # Check if we need to offset the indices (0-based to 1-based)
         # If '0' is in your service list but not in the solution, 
@@ -978,32 +970,27 @@ def process_scenario_pf_mode(
                         f"Caught an exception at scenario {scenario_index} when solving dcpf function: {e}\n",
                     )
     
-        # Randomize droop parameters if enabled
+        # Randomize droop parameters per scenario when requested.
         droop_config_scenario = droop_config
-        if (droop_config and (
-            getattr(droop_config, 'randomize_droop', False) 
-        )):
-            import random
-        if hasattr(droop_config, 'to_dict'):
-                droop_config_scenario = deepcopy(droop_config.to_dict()) 
-        elif isinstance(droop_config, dict):
-            droop_config_scenario = deepcopy(droop_config)
-        else:
+        if droop_config is not None:
+            if hasattr(droop_config, "to_dict"):
+                droop_config_scenario = deepcopy(droop_config.to_dict())
+            elif isinstance(droop_config, dict):
+                droop_config_scenario = deepcopy(droop_config)
+            else:
                 droop_config_scenario = deepcopy(vars(droop_config))
 
-            # Randomize mp (active power droop) within range
-        if getattr(droop_config, 'randomize_droop', False):
-                mp_range = getattr(droop_config, 'mp_range', [0.03, 0.05])
-                droop_config_scenario['mp'] = random.uniform(mp_range[0], mp_range[1])
+            if get_val(droop_config_scenario, "randomize_droop", False):
+                import random
 
-                # Randomize mq (reactive power droop) within range
-                mq_range = getattr(droop_config, 'mq_range', [0.02, 0.04])
-                droop_config_scenario['mq'] = random.uniform(mq_range[0], mq_range[1])
+                mp_range = get_val(droop_config_scenario, "mp_range", [0.03, 0.05])
+                mq_range = get_val(droop_config_scenario, "mq_range", [0.02, 0.04])
+                droop_config_scenario["mp"] = random.uniform(mp_range[0], mp_range[1])
+                droop_config_scenario["mq"] = random.uniform(mq_range[0], mq_range[1])
 
         
 
         try:
-            print(f"DEBUG: About to call run_pf with droop_config = {droop_config_scenario}")
             res = run_pf(perturbation, jl, fast=pf_fast, droop_config=droop_config_scenario)
         except Exception as e:
             with open(error_log_file, "a") as f:
@@ -1127,7 +1114,7 @@ def process_scenario_chunk(
                         pf_fast,
                         dcpf_fast,
                         jl,
-            droop_config,
+                        droop_config,
                     )
 
                 progress_queue.put(1)  # update queue
@@ -1227,7 +1214,7 @@ def process_scenario_opf_mode(
             res,
             res_dcopf,
             include_dc_res,
-            droop_config_scenario,
+            droop_config,
         )
         local_processed_data.append(
             (

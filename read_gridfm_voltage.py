@@ -20,6 +20,104 @@ bus_data_path = os.path.join(results_dir, "bus_data.parquet")
 gen_data_path = os.path.join(results_dir, "gen_data.parquet")
 branch_data_path = os.path.join(results_dir, "branch_data.parquet")
 
+# Read bus data
+df_bus = pd.read_parquet(bus_data_path)
+
+print("=" * 80)
+print("GENERATOR REACTIVE POWER CHECK")
+print("=" * 80)
+
+# Generator buses in GRIDFM (0-indexed)
+gen_buses = [0, 1, 2, 5, 7]
+pscad_buses = [1, 2, 3, 6, 8]
+
+# IEEE 14-bus Q limits from standard data
+q_limits = {
+    1: {'Qmin': -999, 'Qmax': 999, 'Type': 'Slack'},
+    2: {'Qmin': -30.0, 'Qmax': 30.0, 'Type': 'PV'},
+    3: {'Qmin': 0.0, 'Qmax': 40.0, 'Type': 'SYNC'},
+    6: {'Qmin': -6.0, 'Qmax': 24.0, 'Type': 'SYNC'},
+    8: {'Qmin': -6.0, 'Qmax': 24.0, 'Type': 'SYNC'}
+}
+
+print("\nGenerator Reactive Power Output:")
+print("-" * 80)
+print(f"{'PSCAD Bus':<12} {'GRIDFM Bus':<12} {'Type':<8} {'Qg (MVAr)':<12} {'Qmin':<10} {'Qmax':<10} {'Status'}")
+print("-" * 80)
+
+for gridfm_bus, pscad_bus in zip(gen_buses, pscad_buses):
+    bus_data = df_bus[df_bus['bus'] == gridfm_bus]
+    
+    if len(bus_data) > 0:
+        qg = bus_data['Qg'].values[0]
+        vm = bus_data['Vm'].values[0]
+        
+        limits = q_limits[pscad_bus]
+        qmin = limits['Qmin']
+        qmax = limits['Qmax']
+        gen_type = limits['Type']
+        
+        # Check if hitting limits
+        status = "✓ OK"
+        if qg >= qmax - 0.5:
+            status = "⚠️ AT Qmax!"
+        elif qg <= qmin + 0.5:
+            status = "⚠️ AT Qmin!"
+        
+        print(f"{pscad_bus:<12} {gridfm_bus:<12} {gen_type:<8} {qg:<12.2f} {qmin:<10.1f} {qmax:<10.1f} {status}")
+        
+        # Extra detail for Bus 8
+        if pscad_bus == 8:
+            print(f"   → Bus 8 Voltage: {vm:.6f} pu (Setpoint should be 1.090 pu)")
+            if abs(vm - 1.090) > 0.01:
+                print(f"   → Voltage deviation: {vm - 1.090:+.4f} pu from setpoint")
+
+print("\n" + "=" * 80)
+print("ANALYSIS:")
+print("=" * 80)
+
+# Check Bus 8 specifically
+bus8 = df_bus[df_bus['bus'] == 7]
+if len(bus8) > 0:
+    qg8 = bus8['Qg'].values[0]
+    vm8 = bus8['Vm'].values[0]
+    
+    print(f"\n🔍 Bus 8 (GRIDFM Bus 7) Detailed Analysis:")
+    print(f"  Voltage:        {vm8:.6f} pu")
+    print(f"  Target:         1.090 pu")
+    print(f"  Difference:     {vm8 - 1.090:+.6f} pu ({(vm8 - 1.090)/1.090 * 100:+.2f}%)")
+    print(f"  Qg:             {qg8:.2f} MVAr")
+    print(f"  Q Limits:       {q_limits[8]['Qmin']:.1f} to {q_limits[8]['Qmax']:.1f} MVAr")
+    
+    if qg8 >= 23.5:
+        print(f"\n⚠️ ISSUE: Generator is hitting Qmax limit!")
+        print(f"  → Bus becomes PQ type (voltage not controlled)")
+        print(f"  → Voltage drops below setpoint")
+        print(f"\nPossible causes:")
+        print(f"  1. System needs more reactive power than generator can provide")
+        print(f"  2. Check if PSCAD has same Q limits (Qmax=24 MVAr)")
+        print(f"  3. Check if PSCAD generator is also hitting limits")
+    elif qg8 <= -5.5:
+        print(f"\n⚠️ ISSUE: Generator is hitting Qmin limit!")
+        print(f"  → Bus becomes PQ type (voltage not controlled)")
+    else:
+        print(f"\n✓ Generator is within Q limits")
+        print(f"  → But voltage is still {abs(vm8 - 1.090):.4f} pu away from setpoint")
+        print(f"\nPossible causes:")
+        print(f"  1. Check PSCAD voltage setpoint (should be 1.090 pu)")
+        print(f"  2. Different generator/exciter models in PSCAD")
+        print(f"  3. Check if PSCAD reached steady-state")
+
+print("\n" + "=" * 80)
+print("RECOMMENDATION:")
+print("=" * 80)
+print("Compare with PSCAD:")
+print("  1. Check Bus 8 generator Qg in PSCAD")
+print("  2. Verify Q limits: Qmin=-6, Qmax=24 MVAr")
+print("  3. Verify voltage setpoint = 1.090 pu")
+print("  4. Check if generator is hitting Q limits")
+print("=" * 80)
+
 if os.path.exists(branch_data_path):
     print(f"\n✓ Reading branch data from: {branch_data_path}")
     branch_df = pd.read_parquet(branch_data_path)

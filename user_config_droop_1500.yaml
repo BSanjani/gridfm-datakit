@@ -3,8 +3,8 @@
 
 network:
   name: case14_ieee_corrected
-  source: file
-  network_dir: .
+  source: pglib
+  network_dir: none
 
 settings:
   mode: pf

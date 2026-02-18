@@ -136,6 +136,7 @@ def interactive_interface() -> None:
     # --- NEW: pglib grid dropdown ---
     # Full list of PGLib OPF cases (names without the 'pglib_opf_' prefix)
     pglib_grids = [
+        "case2_simple",
         "case3_lmbd",
         "case5_pjm",
         "case14_ieee",

@@ -1,14 +1,14 @@
-# IEEE 14-Bus System Configuration - CORRECTED FOR FEASIBILITY
-# Use this for basic power flow comparison with PSCAD
+# 2-Bus System Configuration
+# Basic power flow comparison with PSCAD
 
 network:
-  name: case14_ieee_corrected
+  name: case2_simple
   source: pglib
   network_dir: none
 
 settings:
   mode: pf
-  data_dir: ./data_out_ieee14_droop_withdeadband
+  data_dir: ./data_out_case2_simple
   num_processes: 8
   max_iter: 300
   pf_fast: false
@@ -17,25 +17,25 @@ settings:
   overwrite: true
   large_chunk_size: 1000
   include_dc_res: true
-  enable_solver_logs: true  # Enable to see what's happening
+  enable_solver_logs: true
 
-# CRITICAL FIX: Reference bus must be the slack bus (Bus 0)
+# Reference bus must be the slack bus (Bus 0)
 droop_control:
-  enabled: false  # ✅ DISABLED for basic power flow comparison
+  enabled: false
   f_nominal: 60.0
   omega_0: 1.0
   V_0: 1.0
-  ref_bus: '0'  # ✅ CORRECTED: Bus 0 is the slack generator (was '13' which is a LOAD!)
-  droop_buses: ['0', '1', '2', '5', '7']  # ✅ CORRECT: All 5 generator buses
-  
-  # For advanced studies, you can enable these later:
-  randomize_droop: true  # Keep false for deterministic results
+  ref_bus: '0'
+  droop_buses: ['0']
+
+  # For advanced studies, enable droop later
+  randomize_droop: true
   mp_range: [0.03, 0.05]
   mq_range: [0.02, 0.04]
-  frequency_deadband: 0.006  # 0.6% frequency deadband
-  voltage_deadband: 0.001  # 0.1% voltage deadband
+  frequency_deadband: 0.006
+  voltage_deadband: 0.001
 
-# Base load case (no variations for initial comparison)
+# Single deterministic load case
 load:
   generator: agg_load_profile
   agg_profile: default
@@ -43,27 +43,21 @@ load:
   start_scaling_factor: 1.0
   max_scaling_factor: 1.0
   step_size: 0.1
-  global_range: 0.0  # ✅ CHANGED: 0.0 = no random load variations
-  sigma: 0.0  # ✅ CHANGED: 0.0 = no random variations
-  change_reactive_power: false  # ✅ CHANGED: Keep Q loads fixed
+  global_range: 0.0
+  sigma: 0.0
+  change_reactive_power: false
 
-# DISABLED perturbations for feasible base case
+# Disable perturbations for baseline comparison
 topology_perturbation:
-  type: none  # ✅ DISABLED: No topology changes
-  # n_topology_variants: 0  # ✅ No random disconnections
-  # k: 0
-  # elements: []
+  type: none
 
 admittance_perturbation:
-  type: none  # ✅ DISABLED: No admittance perturbations
-  # sigma: 0.0
+  type: none
 
 generation_perturbation:
-  type: none  # ✅ DISABLED: No generator cost changes
-  # sigma: 0.0
+  type: none
 
-# NOTES:
-# - This configuration runs a SINGLE base case power flow
-# - No random perturbations = deterministic, feasible results
-# - Perfect for comparing with PSCAD steady-state results
-# - Once this works, you can enable perturbations incrementally
+# Notes:
+# - Runs a single base-case power flow
+# - No random perturbations for deterministic results
+# - Suitable for PSCAD steady-state comparison

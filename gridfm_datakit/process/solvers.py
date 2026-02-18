@@ -95,6 +95,8 @@ def run_pf(net: Network, jl: Any, fast: Union[bool, None] = None, droop_config: 
                     'omega_0': droop_dict.get('omega_0', 1.0),
                     'V_0': droop_dict.get('V_0', 1.0),
                     'droop_buses': droop_dict.get('droop_buses', []),
+                    'mp': droop_dict.get('mp', None),
+                    'mq': droop_dict.get('mq', None),
                     'mp_range': droop_dict.get('mp_range', [0.03, 0.05]),
                     'mq_range': droop_dict.get('mq_range', [0.02, 0.04]),
                     'randomize_droop': droop_dict.get('randomize_droop', False),

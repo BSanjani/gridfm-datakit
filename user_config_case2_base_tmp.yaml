@@ -1,6 +1,3 @@
-# 2-Bus System Configuration
-# Basic power flow comparison with PSCAD
-
 network:
   name: case2_simple
   source: pglib
@@ -8,7 +5,7 @@ network:
 
 settings:
   mode: pf
-  data_dir: ./data_out_case2_simple
+  data_dir: ./data_out_case2_simple_base
   num_processes: 8
   max_iter: 300
   pf_fast: false
@@ -19,16 +16,13 @@ settings:
   include_dc_res: true
   enable_solver_logs: true
 
-# Reference bus must be the slack bus (Bus 0)
 droop_control:
-  enabled: true
+  enabled: false
   f_nominal: 60.0
   omega_0: 1.0
   V_0: 1.1
   ref_bus: '1'
   droop_buses: ['1']
-
-  # For advanced studies, enable droop later
   randomize_droop: false
   mp: 0.10
   mq: 0.10
@@ -37,7 +31,6 @@ droop_control:
   frequency_deadband: 0.006
   voltage_deadband: 0.001
 
-# Single deterministic load case
 load:
   generator: agg_load_profile
   agg_profile: default
@@ -49,7 +42,6 @@ load:
   sigma: 0.0
   change_reactive_power: false
 
-# Disable perturbations for baseline comparison
 topology_perturbation:
   type: none
 
@@ -58,8 +50,3 @@ admittance_perturbation:
 
 generation_perturbation:
   type: none
-
-# Notes:
-# - Runs a single base-case power flow
-# - No random perturbations for deterministic results
-# - Suitable for PSCAD steady-state comparison

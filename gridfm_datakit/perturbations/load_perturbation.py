@@ -23,6 +23,7 @@ def _find_largest_scaling_factor_worker(
     p_ref = net.Pd.copy()  # Active power demand
     q_ref = net.Qd.copy()  # Reactive power demand
     u = start
+    last_feasible_u = None
     converged = True
 
     print("Finding upper limit u .", end="", flush=True)
@@ -55,19 +56,20 @@ def _find_largest_scaling_factor_worker(
 
             # Run OPF using the initialized Julia interface
             result = jl.run_opf(temp_filename)
-            u += step_size
-            print(".", end="", flush=True)
 
-            if str(result["termination_status"]) != "LOCALLY_SOLVED":
-                if u == start:
+            if str(result["termination_status"]) == "LOCALLY_SOLVED":
+                last_feasible_u = u
+                u += step_size
+                print(".", end="", flush=True)
+            else:
+                if last_feasible_u is None:
                     raise RuntimeError(
                         f"OPF did not converge for starting u={u:.3f}",
                     )
                 print(
-                    f"\nOPF did not converge for u={u:.3f}. Using u={u - step_size:.3f} for upper limit",
+                    f"\nOPF did not converge for u={u:.3f}. Using u={last_feasible_u:.3f} for upper limit",
                     flush=True,
                 )
-                u -= step_size
                 converged = False
 
         finally:
@@ -75,7 +77,7 @@ def _find_largest_scaling_factor_worker(
             if os.path.exists(temp_filename):
                 os.unlink(temp_filename)
 
-    return u
+    return last_feasible_u if last_feasible_u is not None else start
 
 
 def load_scenarios_to_df(scenarios: np.ndarray) -> pd.DataFrame:

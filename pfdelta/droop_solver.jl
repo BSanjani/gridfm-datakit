@@ -374,8 +374,10 @@ function build_droop_pf_fixed(pm::AbstractPowerModel)
     volt_deadband  = get(droop_config, "voltage_deadband", 0.0)
 
     droop_buses = Set(parse(Int, b) for b in droop_config["droop_buses"])
-    mp_min, mp_max = droop_config["mp_range"]
-    mq_min, mq_max = droop_config["mq_range"]
+    mp_fixed = get(droop_config, "mp", nothing)
+    mq_fixed = get(droop_config, "mq", nothing)
+    mp_min, mp_max = get(droop_config, "mp_range", [0.03, 0.05])
+    mq_min, mq_max = get(droop_config, "mq_range", [0.02, 0.04])
 
     v_ref_global = droop_config["V_0"]
 
@@ -386,7 +388,10 @@ function build_droop_pf_fixed(pm::AbstractPowerModel)
     mq_map = Dict{Int,Float64}()
 
     for bus in droop_buses
-        if droop_config["randomize_droop"]
+        if mp_fixed !== nothing && mq_fixed !== nothing
+            mp_map[bus] = Float64(mp_fixed)
+            mq_map[bus] = Float64(mq_fixed)
+        elseif droop_config["randomize_droop"]
             mp_map[bus] = rand() * (mp_max - mp_min) + mp_min
             mq_map[bus] = rand() * (mq_max - mq_min) + mq_min
         else
@@ -411,7 +416,7 @@ function build_droop_pf_fixed(pm::AbstractPowerModel)
         ref_bus = parse(Int, string(first(keys(ref(pm, :bus)))))
     end
 
-    # @constraint(pm.model, var(pm, :va, ref_bus) == 0)
+    @constraint(pm.model, var(pm, :va, ref_bus) == 0)
 
     # -----------------------------
     # 5. Frequency deviation variable
@@ -607,6 +612,61 @@ function solve_droop_pf(network::Dict{String,Any}, optimizer)
     end
     if haskey(network, "droop_config")
         pm = instantiate_model(network, ACPPowerModel, build_droop_pf_fixed)
+        # Log key droop state at each Ipopt iteration for infeasibility diagnosis.
+        try
+            base_mva = Float64(get(network, "baseMVA", 100.0))
+            droop_cfg = network["droop_config"]
+            droop_buses = Set(parse(Int, b) for b in droop_cfg["droop_buses"])
+            v0_cfg = get(droop_cfg, "V_0", missing)
+            mp_cfg = get(droop_cfg, "mp", missing)
+            mq_cfg = get(droop_cfg, "mq", missing)
+            iter_log_file = "C:/Users/Bestu/Documents/GitHub/gridfm-datakit/debug_droop_iter.log"
+            open(iter_log_file, "a") do io
+                write(io, "\n=== NEW DROOP SOLVE ===\n")
+                write(io, "baseMVA=$base_mva droop_buses=$(collect(droop_buses))\n")
+                write(io, "V0=$v0_cfg mp=$mp_cfg mq=$mq_cfg\n")
+            end
+            JuMP.set_attribute(pm.model, Ipopt.CallbackFunction(), (
+                alg_mod,
+                iter_count,
+                obj_value,
+                inf_pr,
+                inf_du,
+                mu,
+                d_norm,
+                regularization_size,
+                alpha_du,
+                alpha_pr,
+                ls_trials,
+            ) -> begin
+                parts = String[]
+                for (i, gen) in ref(pm, :gen)
+                    bus_id = gen["gen_bus"]
+                    if bus_id in droop_buses
+                        pg_pu = JuMP.callback_value(pm.model, var(pm, :pg, i))
+                        qg_pu = JuMP.callback_value(pm.model, var(pm, :qg, i))
+                        vm_pu = JuMP.callback_value(pm.model, var(pm, :vm, bus_id))
+                        push!(
+                            parts,
+                            "gen=$(i) bus=$(bus_id) pgMW=$(round(pg_pu * base_mva, digits=4)) qgMVAr=$(round(qg_pu * base_mva, digits=4)) vm=$(round(vm_pu, digits=6))",
+                        )
+                    end
+                end
+                df_val = haskey(var(pm), :df) ? JuMP.callback_value(pm.model, var(pm, :df)) : NaN
+                open(iter_log_file, "a") do io
+                    write(
+                        io,
+                        "iter=$(iter_count) obj=$(obj_value) inf_pr=$(inf_pr) inf_du=$(inf_du) mu=$(mu) df=$(df_val) ",
+                    )
+                    write(io, join(parts, " | ") * "\n")
+                end
+                return true
+            end)
+        catch err
+            open("C:/Users/Bestu/Documents/GitHub/gridfm-datakit/debug_droop.log", "a") do io
+                write(io, "Failed to attach Ipopt iteration callback: $(sprint(showerror, err))\n")
+            end
+        end
         result = optimize_model!(pm, optimizer=optimizer)
     else
         # No droop config, use standard PF

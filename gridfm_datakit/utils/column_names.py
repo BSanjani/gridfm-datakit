@@ -41,6 +41,10 @@ BUS_COLUMNS = [
     "max_vm_pu",
     "GS",
     "BS",
+    "mp_droop",
+    "mq_droop",
+    "frequency_deadband",
+    "voltage_deadband",
 ]
 
 DC_BUS_COLUMNS = ["Va_dc", "Pg_dc"]

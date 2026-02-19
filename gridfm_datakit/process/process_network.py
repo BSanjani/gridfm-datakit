@@ -759,6 +759,39 @@ def pf_post_processing(
     X_bus[:, 14] = net.buses[:, GS] / net.baseMVA
     X_bus[:, 15] = net.buses[:, BS] / net.baseMVA
 
+    # Droop control features for ML-ready node data.
+    # mp/mq are assigned only to configured droop buses, and are zero elsewhere.
+    # deadbands are global config scalars repeated on all buses.
+    mp_bus = np.zeros(n_buses)
+    mq_bus = np.zeros(n_buses)
+    freq_deadband = 0.0
+    volt_deadband = 0.0
+    if droop_config and get_val(droop_config, "enabled", False):
+        mp_val = float(get_val(droop_config, "mp", 0.0))
+        mq_val = float(get_val(droop_config, "mq", 0.0))
+        freq_deadband = float(get_val(droop_config, "frequency_deadband", 0.0))
+        volt_deadband = float(get_val(droop_config, "voltage_deadband", 0.0))
+
+        droop_buses_cfg = get_val(droop_config, "droop_buses", [])
+        droop_buses_internal = set()
+        for b in droop_buses_cfg:
+            try:
+                b_orig = int(b)
+            except (TypeError, ValueError):
+                continue
+            if b_orig in net.bus_index_mapping:
+                droop_buses_internal.add(int(net.bus_index_mapping[b_orig]))
+
+        if len(droop_buses_internal) > 0:
+            idx = np.array(sorted(droop_buses_internal), dtype=int)
+            mp_bus[idx] = mp_val
+            mq_bus[idx] = mq_val
+
+    X_bus[:, 16] = mp_bus
+    X_bus[:, 17] = mq_bus
+    X_bus[:, 18] = freq_deadband
+    X_bus[:, 19] = volt_deadband
+
     if include_dc_res:
         if res_dc is not None:
             va = np.rad2deg(
@@ -771,11 +804,11 @@ def pf_post_processing(
             )
             # convert to range [-180, 180]
             va = (va + 180) % 360 - 180
-            X_bus[:, 16] = va
-            X_bus[:, 17] = Pg_bus_dc
+            X_bus[:, 20] = va
+            X_bus[:, 21] = Pg_bus_dc
         else:
-            X_bus[:, 16] = np.nan
-            X_bus[:, 17] = np.nan
+            X_bus[:, 20] = np.nan
+            X_bus[:, 21] = np.nan
 
     # --- Generator data ---
 

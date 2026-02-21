@@ -28,7 +28,7 @@ def write_psse_raw():
     # Sort to ensure order
     s0_bus.sort_values('bus', inplace=True)
     s0_gen.sort_values('bus', inplace=True)
-    
+
     # 3. Open File for Writing (PSS/E v33 Format)
     with open(OUTPUT_FILE, 'w') as f:
         # Header: 0, 100.00 (MVA Base), 33 (Version), ...

@@ -1,47 +1,9 @@
 import pandas as pd
 import os
 
-def load_q_limits_from_case(case_path):
-    """Read generator Q limits from MATPOWER mpc.gen block."""
-    q_limits = {}
-    in_gen_block = False
-
-    with open(case_path, "r", encoding="utf-8") as f:
-        for raw_line in f:
-            line = raw_line.strip()
-            if line.startswith("mpc.gen = ["):
-                in_gen_block = True
-                continue
-            if in_gen_block and line.startswith("];"):
-                break
-            if not in_gen_block:
-                continue
-            if not line or line.startswith("%"):
-                continue
-
-            # Remove inline comments and row terminator
-            data_part = line.split("%", 1)[0].replace(";", "").strip()
-            if not data_part:
-                continue
-
-            parts = data_part.split()
-            if len(parts) < 5:
-                continue
-
-            bus = int(float(parts[0]))
-            qmax = float(parts[3])
-            qmin = float(parts[4])
-            q_limits[bus] = {"Qmin": qmin, "Qmax": qmax}
-
-    return q_limits
-
 # Path to droop control results
 results_dir = r"C:\Users\Bestu\Documents\GitHub\gridfm-datakit\data_out_ieee14_droop_withdeadband\case14_ieee\raw"
-case_file_path = r"C:\Users\Bestu\Documents\GitHub\gridfm-datakit\gridfm_datakit\grids\pglib_opf_case14_ieee_corrected.m"
 
-
-# Path to results
-# results_dir = r"C:\Users\Bestu\Documents\GitHub\gridfm-datakit\data_out_ieee14_base_case\case14_ieee\raw"
 
 print("=" * 70)
 print("GRIDFM IEEE 14-BUS RESULTS - BUS VOLTAGE DATA")
@@ -63,26 +25,14 @@ print("=" * 80)
 gen_buses = [0, 1, 2, 5, 7]
 pscad_buses = [1, 2, 3, 6, 8]
 
-gen_types = {
-    1: "Slack",
-    2: "PV",
-    3: "SYNC",
-    6: "SYNC",
-    8: "SYNC",
+# IEEE 14-bus Q limits from standard data
+q_limits = {
+    1: {'Qmin': -999, 'Qmax': 999, 'Type': 'Slack'},
+    2: {'Qmin': -30.0, 'Qmax': 30.0, 'Type': 'PV'},
+    3: {'Qmin': 0.0, 'Qmax': 40.0, 'Type': 'SYNC'},
+    6: {'Qmin': -6.0, 'Qmax': 24.0, 'Type': 'SYNC'},
+    8: {'Qmin': -6.0, 'Qmax': 24.0, 'Type': 'SYNC'}
 }
-
-try:
-    q_limits = load_q_limits_from_case(case_file_path)
-    print(f"\nLoaded Q limits from case file: {case_file_path}")
-except Exception as e:
-    print(f"\nWARNING: Could not read case file ({e}). Falling back to hardcoded limits.")
-    q_limits = {
-        1: {"Qmin": 0.0, "Qmax": 10.0},
-        2: {"Qmin": -30.0, "Qmax": 30.0},
-        3: {"Qmin": 0.0, "Qmax": 40.0},
-        6: {"Qmin": -6.0, "Qmax": 24.0},
-        8: {"Qmin": -6.0, "Qmax": 24.0},
-    }
 
 print("\nGenerator Reactive Power Output:")
 print("-" * 80)
@@ -99,7 +49,7 @@ for gridfm_bus, pscad_bus in zip(gen_buses, pscad_buses):
         limits = q_limits[pscad_bus]
         qmin = limits['Qmin']
         qmax = limits['Qmax']
-        gen_type = gen_types.get(pscad_bus, "GEN")
+        gen_type = limits['Type']
         
         # Check if hitting limits
         status = "✓ OK"

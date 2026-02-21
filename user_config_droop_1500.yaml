@@ -6,7 +6,7 @@ network:
 
 settings:
   mode: pf
-  data_dir: ./data_out_case24_s10_droop_mprange_mqrange
+  data_dir: ./data_out_case24_s10000_droop_mprange_mqrange
   num_processes: 8
   max_iter: 300
   pf_fast: false
@@ -33,7 +33,7 @@ droop_control:
 load:
   generator: agg_load_profile
   agg_profile: default
-  scenarios: 10
+  scenarios: 10000
   start_scaling_factor: 1.0
   max_scaling_factor: 1.0
   step_size: 0.1

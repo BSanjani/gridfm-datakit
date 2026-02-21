@@ -1,0 +1,38 @@
+[
+  {
+    "penetration": 0.05,
+    "tag": "p05",
+    "config_file": "user_config_case2000_s20000_droop_strong_p05.yaml",
+    "data_dir": "./data_out_case2000_s20000_droop_strong_p05",
+    "droop_bus_count": 13,
+    "ref_bus": 551,
+    "case_name": "case2000_goc"
+  },
+  {
+    "penetration": 0.1,
+    "tag": "p10",
+    "config_file": "user_config_case2000_s20000_droop_strong_p10.yaml",
+    "data_dir": "./data_out_case2000_s20000_droop_strong_p10",
+    "droop_bus_count": 26,
+    "ref_bus": 551,
+    "case_name": "case2000_goc"
+  },
+  {
+    "penetration": 0.2,
+    "tag": "p20",
+    "config_file": "user_config_case2000_s20000_droop_strong_p20.yaml",
+    "data_dir": "./data_out_case2000_s20000_droop_strong_p20",
+    "droop_bus_count": 52,
+    "ref_bus": 551,
+    "case_name": "case2000_goc"
+  },
+  {
+    "penetration": 0.4,
+    "tag": "p40",
+    "config_file": "user_config_case2000_s20000_droop_strong_p40.yaml",
+    "data_dir": "./data_out_case2000_s20000_droop_strong_p40",
+    "droop_bus_count": 104,
+    "ref_bus": 551,
+    "case_name": "case2000_goc"
+  }
+]

@@ -1,0 +1,51 @@
+# IEEE 2000-bus droop study (20k scenarios, strong gain range, 40% penetration)
+network:
+  name: case2000_goc
+  source: pglib
+  network_dir: none
+
+settings:
+  mode: pf
+  data_dir: ./data_out_case2000_s20000_droop_strong_p40
+  num_processes: 2
+  max_iter: 300
+  pf_fast: false
+  dcpf_fast: true
+  seed: 42
+  overwrite: true
+  large_chunk_size: 250
+  include_dc_res: true
+  enable_solver_logs: false
+
+droop_control:
+  enabled: true
+  f_nominal: 60.0
+  omega_0: 1.0
+  V_0: 1.1
+  ref_bus: '551'
+  droop_buses: ['551','511','512','513','514','515','516','518','522','523','525','529','530','531','532','533','536','537','539','542','543','544','545','546','547','552','554','558','559','560','561','562','563','567','568','569','570','571','572','574','575','576','577','578','579','581','582','587','588','590','594','595','596','597','599','1208','1212','1213','1214','1216','1219','1226','1227','1228','1229','1230','1232','1233','1237','1238','1243','1244','1246','1251','1252','1253','1256','1257','1258','1259','1260','1261','1262','1266','1267','1271','1272','1273','1274','1277','1281','1282','1283','1284','1285','1289','1290','1291','1295','1296','1297','1298','1300','1301']
+  randomize_droop: true
+  mp_range: [0.01, 0.10]
+  mq_range: [0.01, 0.08]
+  frequency_deadband: 0.006
+  voltage_deadband: 0.001
+
+load:
+  generator: agg_load_profile
+  agg_profile: default
+  scenarios: 20000
+  start_scaling_factor: 1.0
+  max_scaling_factor: 1.0
+  step_size: 0.1
+  global_range: 0.0
+  sigma: 0.0
+  change_reactive_power: false
+
+topology_perturbation:
+  type: none
+
+admittance_perturbation:
+  type: none
+
+generation_perturbation:
+  type: none

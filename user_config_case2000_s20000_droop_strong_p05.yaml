@@ -1,0 +1,51 @@
+# IEEE 2000-bus droop study (20k scenarios, strong gain range, 5% penetration)
+network:
+  name: case2000_goc
+  source: pglib
+  network_dir: none
+
+settings:
+  mode: pf
+  data_dir: ./data_out_case2000_s20000_droop_strong_p05
+  num_processes: 2
+  max_iter: 300
+  pf_fast: false
+  dcpf_fast: true
+  seed: 42
+  overwrite: true
+  large_chunk_size: 250
+  include_dc_res: true
+  enable_solver_logs: false
+
+droop_control:
+  enabled: true
+  f_nominal: 60.0
+  omega_0: 1.0
+  V_0: 1.1
+  ref_bus: '551'
+  droop_buses: ['551','511','512','513','514','515','516','518','522','523','525','529','530']
+  randomize_droop: true
+  mp_range: [0.01, 0.10]
+  mq_range: [0.01, 0.08]
+  frequency_deadband: 0.006
+  voltage_deadband: 0.001
+
+load:
+  generator: agg_load_profile
+  agg_profile: default
+  scenarios: 20000
+  start_scaling_factor: 1.0
+  max_scaling_factor: 1.0
+  step_size: 0.1
+  global_range: 0.0
+  sigma: 0.0
+  change_reactive_power: false
+
+topology_perturbation:
+  type: none
+
+admittance_perturbation:
+  type: none
+
+generation_perturbation:
+  type: none
